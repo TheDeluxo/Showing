@@ -9,25 +9,28 @@ import base45
 import cbor2
 from cose.messages import CoseMessage
 
+# First resetting the screen
 os.system("cls")
 os.system("color 0f")
 print(" .::::::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE:::::::::::::::::::::::::::::::::::::::.")
 print(" .::::::::::::::::::::::::::::::::::::::ЦОФРОВ COVID СЕРТИФИКАТ НА ЕС::::::::::::::::::::::::::::::::::::::.")
 
-
+"""
+# Visible input
 print('Please, scan the QR\n')
 print('Or type "exit" to quit\n')
 payload = input() # waiting the user input
 # if user type in "exit" will terminate the script and the window
 if payload.lower() == "exit": # case insensitive
      sys.exit()
+"""
 
-"""
-payload = getpass.getpass('Please, scan the QR and wait a bit...\n')
-payload = str(payload)
-print(payload)
-os.system("pause")
-"""
+# Invisible input
+# waiting the user input
+payload = getpass.getpass('Please, scan the QR and wait a bit...\nOr type "exit" to quit\n')
+# if user type in "exit" will terminate the script and the window
+if payload.lower() == "exit": # case insensitive
+     sys.exit()
 
 payload = payload[4:]
 
@@ -51,11 +54,11 @@ cose = CoseMessage.decode(decompressed)
 whole = (json.dumps(cbor2.loads(cose.payload),ensure_ascii=False, indent=2))
 j_whole = json.loads(whole)
 
-# Opening the config file in read mode taking the value as var.
-f = open("time.ini", "r")
-ff = list(f)
-ff = int(ff[0])
-f.close()
+# Opening the ini file
+f = open("time.ini", "r") # Opens it in read mode
+ff = list(f)              # Converting data to list
+ff = int(ff[0])           # Taking the first (and only) item and convert it to int
+f.close()                 # Closes the file
 
 # Checking validity
 def validity():
@@ -63,10 +66,12 @@ def validity():
     date = datetime.strptime(date_from, '%Y-%m-%d') + timedelta(days=ff)
     # Comparing the date to check with today
     if today < date:
+        # Doing it like that so no additional .bat files are needed
         os.system("color 20")
         os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is valid!" "Information"')
         os.system("main.py")
     else:
+        # Doing it like that so no additional .bat files are needed
         os.system("color c0")
         os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is invalid!" "Attention!" /i:E')
         os.system("main.py")
