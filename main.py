@@ -17,31 +17,37 @@ print(" .::::::::::::::::::::::::::::::::::::::ЦОФРОВ COVID СЕРТИФИ
 
 print('Please, scan the QR\n')
 print('Or type "exit" to quit\n')
-payload = input()
-if payload.lower() == "exit":
-    sys.exit()
+payload = input() # waiting the user input
+# if user type in "exit" will terminate the script and the window
+if payload.lower() == "exit": # case insensitive
+     sys.exit()
 
-# payload = getpass.getpass(prompt = 'Please, scan the QR and wait a bit...\n', stream = None)
-# payload = str(payload)
-# print(payload)
-# os.system("pause")
+"""
+payload = getpass.getpass('Please, scan the QR and wait a bit...\n')
+payload = str(payload)
+print(payload)
+os.system("pause")
+"""
 
 payload = payload[4:]
-
-# Sick
-# payload = "NCFOXN*TS0BI$ZDYSH$PJ6RQPM3 RF:D4+Z8-36HD7-TM5V4I/QI9C+MH+W2RAC/GPWBILC9%FAGUUR-SCG1CSQ6U7SSQY%SVJ55M8N:4*J5N3I4-2Q093TKG9J+30G9A450:IU$*SJAK9B9EEDG%8G%85QNG.8W%89B9H*KJ2KX2M093/24G*L:%5+9D.XIKXB8UJ06J9UBSVAXCIF4LEIIPBJ NI5VA81K0ECM8CXVDC8C 1J5OI9YI:8DBLC+NDC%QE2KI7JSTNB95WAM/ROUK1H%55:NH-S8VGCPEV*PB86QQOI%KXYNDZCG2F.7B7D0ZLO0I1 O2LV9586COO6443WE970R B4JBPC98AEBVL$UK*5GXPC6LFND9AQC$UK5RCV9NA+H.8LP2DS22XCNQ+MN/QP9QE8QHOO$+K8MO-TJD6L81FYUR:*IZQ8//LSDU4O3/1DGXRPOVVZT:+JPVBGCPS+E%BA$R1%2S84A$2IQ898%S:0FBSK G7KP2:.AKH3:H6/AWF50D8WK0"
-# vac
-# payload = "NCFOXN*TS0BI$ZDYSH$PJ6RQPM3 RF:D4+ A-36HD7-TMAZ4H4QI9CGJ9RUIRAC/GPWBILC9GGBYPLR-SCG1CSQ6U7SSQY%SVJ55M8N:4.TL4WSN2EJ/1S65434IXPV44S:577I$*SJAK9B92FF9B9LW4G%89-8CNNM3LW1HVD9B.OD4OYGFO-O%Z8JH1PCDJ*3TFH2V4IE9MIHJ6W48UK.GCY0$2PH/MIE9WT0K3M9UVZSVV*001HW%8UE9.955B9-NT0 2$$0X4PCY0+-CVYCRMTB*05*9O%0HJP7NVDEBK3JPZ0I2U9-87LPMIH-O92UQ-C1KV9JBM$DHXG0+NOJXU0T9QK90VLT7O32TVVH3REECFN%GF-2P253ZCK$B9LF781YV3QZ94JBCD9AQC$UK5RCK4GBLEH-B/GG.8L:3DIQCOZ9MCHIUJ6/3ACMQ+MN/QP9QE8Q POMMU50EUGP819C LEX2Q.TORE7/O0OTPY2ZL230OSWP*6QB/7C9FOSJ36KE:A3RD1XRM:OH/PQ$GA432CUKW13ZKD/LADLBTRJLPQ5MU I3$I"
 
 # decode Base45 (remove HC1: prefix)
 decoded = base45.b45decode(str(payload))
 
 # decompress using zlib
-decompressed = zlib.decompress(decoded)
+try:
+    decompressed = zlib.decompress(decoded)
+except:
+    # If QR not okay, will execute this
+    print("The QR is not read correctly or something illegal is typed in.")
+    print("Restarting...")
+    os.system("PING -n 7 127.0.0.1>nul")
+    os.system("start.bat")
 # decode COSE message (no signature verification done)
 cose = CoseMessage.decode(decompressed)
 # decode the CBOR encoded payload and print as json
 
+# Converting the information to readable json struct
 whole = (json.dumps(cbor2.loads(cose.payload),ensure_ascii=False, indent=2))
 j_whole = json.loads(whole)
 
@@ -53,7 +59,9 @@ f.close()
 
 # Checking validity
 def validity():
+    # Forming the date to check by adding the days from the .ini file to the date from the cert
     date = datetime.strptime(date_from, '%Y-%m-%d') + timedelta(days=ff)
+    # Comparing the date to check with today
     if today < date:
         os.system("color 20")
         os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is valid!" "Information"')
