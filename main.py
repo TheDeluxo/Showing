@@ -16,9 +16,11 @@ print(" .::::::::::::::::::::::::::::::::::::::ЦОФРОВ COVID СЕРТИФИ
 
 
 print('Please, scan the QR\n')
+print('Or type "exit" to quit\n')
 payload = input()
-if payload == "exit":
+if payload.lower() == "exit":
     sys.exit()
+
 # payload = getpass.getpass(prompt = 'Please, scan the QR and wait a bit...\n', stream = None)
 # payload = str(payload)
 # print(payload)
