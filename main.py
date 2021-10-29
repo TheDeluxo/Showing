@@ -34,9 +34,10 @@ if payload.lower() == "exit": # case insensitive
 
 payload = payload[4:]
 
+
 # decode Base45 (remove HC1: prefix)
 try:
-    decoded = base45.b45decode(str(payload))
+    decoded = base45.b45decode(payload)
 except:
     # If QR not okay, will execute this
     print("The QR is not read correctly or something illegal is typed in.\nCheck the input language.") # prompt
@@ -67,13 +68,17 @@ ff = list(f)              # Converting data to list
 ff = int(ff[0])           # Taking the first (and only) item and convert it to int
 f.close()                 # Closes the file
 
-# Checking validity
-def validity():
+def ver_check():
     print("")
     print("__________________________")
     print("Debugging: ")
     print("Current version: " + ver)
     print("__________________________")
+
+# Checking validity
+def validity():
+    # json version check. Should be removed once finished
+    ver_check()
     # Forming the date to check by adding the days from the .ini file to the date from the cert
     # Dealing with the differences in the struct versions
     if ver == "1.3.0":
@@ -123,11 +128,13 @@ def vac():
 
 # Determining the kind of cert
 dick = j_whole['-260']['1']
-for k, v in reversed(dick.items()):  # reverse walk through cuz of the "ver" position
+for k, v in reversed(dick.items()):  # reverse walk through because of the "ver" position
+    #print("current k = " + str(k) + " current v = " + str(v))
     if k == "ver":
         ver = v
     if k == "r": # recovery
-        if v != "null":
+        #print("current k = " + str(k) + " current v = " + str(v))
+        if v == "null":
             continue
         # building variables
         date_from = j_whole['-260']['1']['r'][0]['du']
