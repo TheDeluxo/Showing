@@ -13,11 +13,24 @@ def reset():  # restarts the whole program
     # os.system("Covid_Checker.exe")  # using this once ready to be .exe exported
     os.system("python main.py")       # using this while testing
 
+# Countries and codes
+CO = {'AD':'Andorra', 'AE':'United Arab Emirates', 'AT':'Austria', 'BE':'Belgium','BG':'Bulgaria', 'CH':'Switzerland',
+      'CY':'Cyprus', 'CZ':'Czech Republic', 'DE':'Germany', 'DK':'Denmark', 'EE':'Estonia', 'ES':'Spain', 'FI':'Finland',
+      'FR':'France', 'GE':'Georgia', 'GR':'Greece', 'HR':'Croatia', 'HU':'Hungary', 'IE':'Ireland', 'IS':'Iceland',
+      'IT':'Italy', 'LI':'Liechtenstein','LT':'Lithuania', 'LU':'Luxembourg', 'LV':'Latvia', 'MA':'Morocco', 'MT':'Malta',
+      'NL':'Netherlands', 'NO':'Norway','PL':'Poland', 'PT':'Portugal', 'RO':'Romania', 'SE':'Sweden', 'SG':'Singapore',
+      'SI':'Slovenia', 'SK':'Slovakia', 'SM':'San Marino', 'UA':'Ukraine', 'VA':'Vatican'}
+"""
+# Walking over CO for test
+for k, v in CO.items():
+    print("Code: " + k + " = Country: " + v)
+# os.system("pause")
+"""
 # First resetting the screen
 os.system("cls")
 os.system("color 0f")
-print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
-print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
+print(".:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+print(".:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
 
 # Invisible input
 payload = getpass.getpass('Please, scan the QR on the certificate\nOr type "exit" to quit\n')  # waiting the user input
@@ -69,7 +82,7 @@ os.system("pause")
 """
 
 # Opening the ini file
-f = open("time.ini", "r") # Opens it in read mode
+f = open("validity.ini", "r") # Opens it in read mode
 ff = list(f)              # Converting data to list
 ff = int(ff[0])           # Taking the first (and only) item and convert it to int
 f.close()                 # Closes the file
@@ -82,12 +95,12 @@ def validity():
     elif len(date_from) > 10:
         date = datetime.strptime(date_from[:10], '%Y-%m-%d') + timedelta(days=ff)  # trimming the unnecessary
     # Comparing the date of expire against today
-    if today < date:
+    if today < date:  # Valid cert
         # Doing it like that so no additional .bat files are needed
         os.system("color 20")
         os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is valid!" "Information">nul')
         reset()
-    else:
+    else:  # Invalid cert
         # Doing it like that so no additional .bat files are needed
         os.system("color c0")
         os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is invalid!" "Attention!" /i:E>nul')
@@ -96,51 +109,60 @@ def validity():
 # Recovery cert
 def sick_cert():
     os.system("cls")
-    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
-    print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
     print("")
-    print(" .:::::::::::::::::::::::::::::::::::::::Recovery certificate::::::::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::::::Recovery certificate::::::::::::::::::::::::::::::::::::::::.")
     print("Certificate information: ")
     print("Native Name: " + str(j_whole['-260']['1']['nam']['gn']) + " " + str(j_whole['-260']['1']['nam']['fn']))
     print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
     print("Valid from:  " + str(j_whole['-260']['1']['r'][0]['df']))
     print("Valid until: " + str(j_whole['-260']['1']['r'][0]['du']))
     print("Unique Certificate Identifier: " + str(j_whole['-260']['1']['r'][0]['ci'][9:]))
-    print("Country: " + (j_whole['1']))
+    for K, V in CO.items():
+        if j_whole['1'] == K:
+            print("Country: " + V)
+    # print("Country: " + (j_whole['1']))
     validity()
 
 # Vacc cert
 def vac_cert():
     os.system("cls")
-    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
-    print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
-    print("")
-    print(" .::::::::::::::::::::::::::::::::::::::Vaccination certificate::::::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
+    print(" ")
+    print(".::::::::::::::::::::::::::::::::::::::Vaccination certificate::::::::::::::::::::::::::::::::::::::.")
     print("Certificate information: ")
     print("Native Name: " + str(j_whole['-260']['1']['nam']['gn'] + " "  + str(j_whole['-260']['1']['nam']['fn'])))
     print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt'] + " " + str(j_whole['-260']['1']['nam']['fnt'])))
     print("Date Issued: " + str(j_whole['-260']['1']['v'][0]['dt']))
     print("Unique Certificate Identifier: " + j_whole['-260']['1']['v'][0]['ci'])
-    print("Country: " + (j_whole['1']))
+    for K, V in CO.items():
+        if j_whole['1'] == K:
+            print("Country: " + V)
+    # print("Country: " + (j_whole['1']))
     validity()
 
 # Test cert
 def test_cert():
     os.system("cls")
-    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(".:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
     print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
-    print("")
-    print(" .:::::::::::::::::::::::::::::::::::::::::Test certificate::::::::::::::::::::::::::::::::::::::::::.")
+    print(" ")
+    print(".:::::::::::::::::::::::::::::::::::::::::Test certificate::::::::::::::::::::::::::::::::::::::::::.")
     print("Certificate information: ")
     print("Native Name: " + str(j_whole['-260']['1']['nam']['gn']) + " " + str(j_whole['-260']['1']['nam']['fn']))
     print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
     print("Date Issued: " + str(j_whole['-260']['1']['t'][0]['sc']))
     print("Unique Certificate Identifier: " + j_whole['-260']['1']['t'][0]['ci'])
-    print("Country: " + (j_whole['1']))
+    for K, V in CO.items():
+        if j_whole['1'] == K:
+            print("Country: " + V)
+    # print("Country: " + (j_whole['1']))
     validity()
 
 # Determining the kind of cert
-dick = j_whole['-260']['1']
+dick = j_whole['-260']['1']  # the dic with the needed information for the func above
 for k, v in dick.items():
     if k == "r": # recovery
         if v is None:  # if empty will continue to the next sub-dic
