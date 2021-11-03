@@ -1,3 +1,3 @@
 # Showing
 Showing stuff to others
-Python covid cert checker v1.0
+Curently showing Python covid cert checker v3.1
