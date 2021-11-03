@@ -9,58 +9,64 @@ import base45
 import cbor2
 from cose.messages import CoseMessage
 
+def reset():  # restarts the whole program
+    # os.system("Covid_Checker.exe")  # using this once ready to be .exe exported
+    os.system("python main.py")       # using this while testing
+
 # First resetting the screen
 os.system("cls")
 os.system("color 0f")
-print(" .::::::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE:::::::::::::::::::::::::::::::::::::::.")
-print(" .::::::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС::::::::::::::::::::::::::::::::::::::.")
-
-"""
-# Visible input
-print('Please, scan the QR\n')
-print('Or type "exit" to quit\n')
-payload = input() # waiting the user input
-# if user type in "exit" will terminate the script and the window
-if payload.lower() == "exit": # case insensitive
-     sys.exit()
-"""
+print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
 
 # Invisible input
-# waiting the user input
-payload = getpass.getpass('Please, scan the QR and wait a bit...\nOr type "exit" to quit\n')
+payload = getpass.getpass('Please, scan the QR on the certificate\nOr type "exit" to quit\n')  # waiting the user input
 # if user type in "exit" will terminate the script and the window
 if payload.lower() == "exit": # case insensitive
      sys.exit()
 
+# trimming the prefix
 payload = payload[4:]
 
+# Decoding is done in steps for better documentation and debugging
 
-# decode Base45 (remove HC1: prefix)
+# decode Base45 (with removed HC1: prefix)
 try:
     decoded = base45.b45decode(payload)
 except:
     # If QR not okay, will execute this
-    print("The QR is not read correctly or something illegal is typed in.\nCheck the input language.") # prompt
-    print("Restarting...")                                                  # prompt
-    os.system("PING -n 7 127.0.0.1>nul")                                    # wait time
-    os.system("start.bat")                                                  # restart the whole thing
+    print("The QR is not read correctly or something illegal is typed in.\nCheck the input language or 'Caps lock'.") # prompt
+    print("Restarting...")                # prompt
+    os.system("PING -n 7 127.0.0.1>nul")  # wait time
+    reset()
 
 # decompress using zlib
 try:
     decompressed = zlib.decompress(decoded)
 except:
     # If QR not okay, will execute this
-    print("The QR is not read correctly or something illegal is typed in.\nCheck the input language.") # prompt
-    print("Restarting...")                                                  # prompt
-    os.system("PING -n 7 127.0.0.1>nul")                                    # wait time
-    os.system("start.bat")                                                  # restart the whole thing
+    print("The QR is not read correctly or something illegal is typed in.\nCheck the input language or 'Caps lock'.") # prompt
+    print("Restarting...")                # prompt
+    os.system("PING -n 7 127.0.0.1>nul")  # wait time
+    reset()
 
 # decode COSE message (no signature verification done)
 cose = CoseMessage.decode(decompressed)
 
 # decode the CBOR encoded payload converting the information to readable json struct
-whole = (json.dumps(cbor2.loads(cose.payload),ensure_ascii=False, indent=2))
+whole = (json.dumps(cbor2.loads(cose.payload), ensure_ascii=False, indent=2, sort_keys=True, default=str))  # reliable
 j_whole = json.loads(whole)
+
+"""
+# Debugging in case of new json struct
+print("Debugging...")
+print("__________________________")
+print(whole)
+# print(j_whole['1'])
+print("__________________________")
+print(" ")
+os.system("pause")
+"""
 
 # Opening the ini file
 f = open("time.ini", "r") # Opens it in read mode
@@ -68,83 +74,96 @@ ff = list(f)              # Converting data to list
 ff = int(ff[0])           # Taking the first (and only) item and convert it to int
 f.close()                 # Closes the file
 
-def ver_check():
-    print("")
-    print("__________________________")
-    print("Debugging: ")
-    print("Current version: " + ver)
-    print("__________________________")
-
 # Checking validity
 def validity():
-    # json version check. Should be removed once finished
-    ver_check()
     # Forming the date to check by adding the days from the .ini file to the date from the cert
-    # Dealing with the differences in the struct versions
-    if ver == "1.3.0":
+    if len(date_from) == 10:
         date = datetime.strptime(date_from, '%Y-%m-%d') + timedelta(days=ff)
-    elif ver == "1.0.0":
+    elif len(date_from) > 10:
         date = datetime.strptime(date_from[:10], '%Y-%m-%d') + timedelta(days=ff)  # trimming the unnecessary
     # Comparing the date of expire against today
     if today < date:
         # Doing it like that so no additional .bat files are needed
         os.system("color 20")
-        os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is valid!" "Information"')
-        os.system("main.py")
+        os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is valid!" "Information">nul')
+        reset()
     else:
         # Doing it like that so no additional .bat files are needed
         os.system("color c0")
-        os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is invalid!" "Attention!" /i:E')
-        os.system("main.py")
+        os.system('@echo off && chcp 65001>nul && start /b /wait MessageBox.exe "The certificate is invalid!" "Attention!" /i:E>nul')
+        reset()
 
-def sick():
+# Recovery cert
+def sick_cert():
     os.system("cls")
-    print(" .::::::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE:::::::::::::::::::::::::::::::::::::::.")
-    print(" .::::::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС::::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
     print("")
-    print(" .::::::::::::::::::::::::::::::::::::::::::Recovery certificate:::::::::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::::::Recovery certificate::::::::::::::::::::::::::::::::::::::::.")
     print("Certificate information: ")
-    print("BG Name: " + str(j_whole['-260']['1']['nam']['gn']) + " "  + str(j_whole['-260']['1']['nam']['fn']))
-    print("EN Name: " + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
+    print("Native Name: " + str(j_whole['-260']['1']['nam']['gn']) + " " + str(j_whole['-260']['1']['nam']['fn']))
+    print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
     print("Valid from:  " + str(j_whole['-260']['1']['r'][0]['df']))
     print("Valid until: " + str(j_whole['-260']['1']['r'][0]['du']))
     print("Unique Certificate Identifier: " + str(j_whole['-260']['1']['r'][0]['ci'][9:]))
-    print("Country: " + j_whole['-260']['1']['r'][0]['co'])
+    print("Country: " + (j_whole['1']))
     validity()
 
-def vac():
+# Vacc cert
+def vac_cert():
     os.system("cls")
-    print(" .::::::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE:::::::::::::::::::::::::::::::::::::::.")
-    print(" .::::::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС::::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
     print("")
-    print(" .:::::::::::::::::::::::::::::::::::::::::Vaccination certificate:::::::::::::::::::::::::::::::::::::::::.")
+    print(" .::::::::::::::::::::::::::::::::::::::Vaccination certificate::::::::::::::::::::::::::::::::::::::.")
     print("Certificate information: ")
-    print("BG Name: " + str(j_whole['-260']['1']['nam']['gn']) + " "  + str(j_whole['-260']['1']['nam']['fn']))
-    print("EN Name: " + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
+    print("Native Name: " + str(j_whole['-260']['1']['nam']['gn'] + " "  + str(j_whole['-260']['1']['nam']['fn'])))
+    print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt'] + " " + str(j_whole['-260']['1']['nam']['fnt'])))
     print("Date Issued: " + str(j_whole['-260']['1']['v'][0]['dt']))
-    print("Unique Certificate Identifier: " + j_whole['-260']['1']['v'][0]['ci'][9:])
-    print("Country: " + j_whole['-260']['1']['v'][0]['co'])
+    print("Unique Certificate Identifier: " + j_whole['-260']['1']['v'][0]['ci'])
+    print("Country: " + (j_whole['1']))
+    validity()
+
+# Test cert
+def test_cert():
+    os.system("cls")
+    print(" .:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE::::::::::::::::::::::::::::::::::::.")
+    print(" .:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
+    print("")
+    print(" .:::::::::::::::::::::::::::::::::::::::::Test certificate::::::::::::::::::::::::::::::::::::::::::.")
+    print("Certificate information: ")
+    print("Native Name: " + str(j_whole['-260']['1']['nam']['gn']) + " " + str(j_whole['-260']['1']['nam']['fn']))
+    print("EN Name: "     + str(j_whole['-260']['1']['nam']['gnt']) + " " + str(j_whole['-260']['1']['nam']['fnt']))
+    print("Date Issued: " + str(j_whole['-260']['1']['t'][0]['sc']))
+    print("Unique Certificate Identifier: " + j_whole['-260']['1']['t'][0]['ci'])
+    print("Country: " + (j_whole['1']))
     validity()
 
 # Determining the kind of cert
 dick = j_whole['-260']['1']
-for k, v in reversed(dick.items()):  # reverse walk through because of the "ver" position
-    #print("current k = " + str(k) + " current v = " + str(v))
-    if k == "ver":
-        ver = v
+for k, v in dick.items():
     if k == "r": # recovery
-        #print("current k = " + str(k) + " current v = " + str(v))
-        if v == "null":
+        if v is None:  # if empty will continue to the next sub-dic
             continue
         # building variables
-        date_from = j_whole['-260']['1']['r'][0]['du']
+        date_from = j_whole['-260']['1']['r'][0]['df']
         today = datetime.today()
         # calling the right func
-        sick()
+        sick_cert()
     elif k == "v": # vaccine
+        if v is None:
+            continue
         # building variables
         date_from = j_whole['-260']['1']['v'][0]['dt']
         today = datetime.today()
         # calling the right func
-        vac()
+        vac_cert()
+    elif k == "t": # test cert
+        if v is None:
+            continue
+        # building variables
+        date_from = j_whole['-260']['1']['t'][0]['sc']
+        today = datetime.today()
+        # calling the right func
+        test_cert()
 
