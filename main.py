@@ -10,8 +10,8 @@ import cbor2
 from cose.messages import CoseMessage
 
 def reset():  # restarts the whole program
-    # os.system("Covid_Checker.exe")  # using this once ready to be .exe exported
-    os.system("python main.py")       # using this while testing
+    os.system("Covid_Checker.exe")    # using this once ready to be .exe exported
+    # os.system("python main.py")       # using this while testing
 
 # Countries and codes
 CO = {'AD':'Andorra', 'AE':'United Arab Emirates', 'AT':'Austria', 'BE':'Belgium','BG':'Bulgaria', 'CH':'Switzerland',
@@ -33,10 +33,7 @@ print(".:::::::::::::::::::::::::::::::::::EU DIGITAL COVID CERTIFICATE:::::::::
 print(".:::::::::::::::::::::::::::::::::::ЦИФРОВ COVID СЕРТИФИКАТ НА ЕС:::::::::::::::::::::::::::::::::::.")
 
 # Invisible input
-payload = getpass.getpass('Please, scan the QR on the certificate\nOr type "exit" to quit\n')  # waiting the user input
-# if user type in "exit" will terminate the script and the window
-if payload.lower() == "exit": # case insensitive
-     sys.exit()
+payload = getpass.getpass('Please, scan the QR on the certificate\nClose the window to quit\n')  # waiting the user input
 
 # trimming the prefix
 payload = payload[4:]
